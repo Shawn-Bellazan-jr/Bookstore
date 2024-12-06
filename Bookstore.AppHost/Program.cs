@@ -4,7 +4,8 @@ using StackExchange.Redis;
 var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedis("cache", 6379)
-    .WithRedisInsight();
+    .WithRedisInsight()
+    .WithRedisCommander();
 
 var apiService = builder.AddProject<Projects.Bookstore_ApiService>("apiservice");
 
