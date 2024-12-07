@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using Bookstore.ApiService.Interfaces;
-using Bookstore.ApiService.Models;
+using Bookstore.Shared.Models;
 using StackExchange.Redis;
 
 namespace Bookstore.ApiService.Services
@@ -24,8 +24,25 @@ namespace Bookstore.ApiService.Services
 
         public async Task<IEnumerable<Book>> GetAllBooksAsync()
         {
-            await Task.Delay(100); // Simulate asynchronous operation
-            return _books.ToList();
+            var server = _database.Multiplexer.GetServer(_database.Multiplexer.GetEndPoints().First());
+            var keys = server.Keys(pattern: "*").ToArray();
+
+            var books = new List<Book>();
+
+            foreach (var key in keys)
+            {
+                var cachedBookJson = await _database.StringGetAsync(key);
+                if (!string.IsNullOrEmpty(cachedBookJson))
+                {
+                    var book = JsonSerializer.Deserialize<Book>(cachedBookJson);
+                    if (book != null)
+                    {
+                        books.Add(book);
+                    }
+                }
+            }
+
+            return books;
         }
 
         public async Task<Book> GetBookByIdAsync(Guid id)

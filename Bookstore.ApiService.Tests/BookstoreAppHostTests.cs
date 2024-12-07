@@ -1,5 +1,5 @@
 ﻿using Aspire.Hosting;
-using Bookstore.ApiService.Models;
+using Bookstore.Shared.Models;
 using Projects;
 using System.Net;
 using System.Net.Http;

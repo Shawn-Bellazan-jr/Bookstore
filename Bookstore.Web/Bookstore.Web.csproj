@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bookstore.ServiceDefaults\Bookstore.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Bookstore.Shared\Bookstore.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

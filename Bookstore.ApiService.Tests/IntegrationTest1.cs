@@ -1,4 +1,4 @@
-namespace Bookstore.ApiService.Tests.Tests
+namespace Bookstore.ApiService.Tests
 {
     public class IntegrationTest1
     {

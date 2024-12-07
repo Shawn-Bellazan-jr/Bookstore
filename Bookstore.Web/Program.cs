@@ -1,5 +1,8 @@
+using Bookstore.ServiceDefaults;
 using Bookstore.Web;
 using Bookstore.Web.Components;
+using Bookstore.Web.Interfaces;
+using Bookstore.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +20,15 @@ builder.Services.AddHttpClient<WeatherApiClient>(client =>
         // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
         client.BaseAddress = new("https+http://apiservice");
     });
+
+builder.Services.AddHttpClient<HttpClient>(client =>
+{
+    // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
+    // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
+    client.BaseAddress = new("https+http://apiservice");
+});
+
+builder.Services.AddScoped<IBookService, BookService>();
 
 var app = builder.Build();
 
