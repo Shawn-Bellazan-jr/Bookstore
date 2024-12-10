@@ -1,5 +1,6 @@
 ﻿@page "/customers"
 
+@inject IDialogService DialogService
 @inject IUnitOfWork UnitOfWork
 
 <MudContainer>
@@ -34,7 +35,7 @@
 
     private async Task LoadCustomersAsync()
     {
-        customers = (await UnitOfWork.CustomerService.GetAllAsync()).ToList();
+        customers = (await UnitOfWork.Customers.GetAllAsync()).ToList();
     }
 
     private async Task AddCustomer()
@@ -45,9 +46,9 @@
         var dialog = DialogService.Show<CustomerDialog>("Add Customer", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Cancelled && result.Data is Customer newCustomer)
+        if (!result.Canceled && result.Data is Customer newCustomer)
         {
-            var createdCustomer = await UnitOfWork.CustomerService.CreateAsync(newCustomer);
+            var createdCustomer = await UnitOfWork.Customers.CreateAsync(newCustomer);
             customers.Add(createdCustomer);
         }
     }
@@ -60,9 +61,9 @@
         var dialog = DialogService.Show<CustomerDialog>("Edit Customer", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Cancelled && result.Data is Customer updatedCustomer)
+        if (!result.Canceled && result.Data is Customer updatedCustomer)
         {
-            await UnitOfWork.CustomerService.UpdateAsync(updatedCustomer);
+            await UnitOfWork.Customers.UpdateAsync(updatedCustomer);
             var index = customers.IndexOf(customer);
             if (index >= 0) customers[index] = updatedCustomer;
         }
@@ -77,7 +78,7 @@
 
         if (confirmed == true)
         {
-            await UnitOfWork.CustomerService.DeleteAsync(customer.Id);
+            await UnitOfWork.Customers.DeleteAsync(customer.Id);
             customers.Remove(customer);
         }
     }

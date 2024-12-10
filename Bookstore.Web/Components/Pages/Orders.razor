@@ -1,5 +1,6 @@
 ﻿@page "/orders"
 
+@inject IDialogService DialogService
 @inject IUnitOfWork UnitOfWork
 
 <MudContainer>
@@ -13,7 +14,7 @@
             <MudTh>Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd>@context.OrderId</MudTd>
+            <MudTd>@context.Id</MudTd>
             <MudTd>@context.CustomerName</MudTd>
             <MudTd>@context.Total.ToString("C")</MudTd>
             <MudTd>
@@ -34,7 +35,7 @@
 
     private async Task LoadOrdersAsync()
     {
-        orders = (await UnitOfWork.OrderService.GetAllAsync()).ToList();
+        orders = (await UnitOfWork.Orders.GetAllAsync()).ToList();
     }
 
     private async Task AddOrder()
@@ -45,9 +46,9 @@
         var dialog = DialogService.Show<OrderDialog>("Add Order", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Cancelled && result.Data is Order newOrder)
+        if (!result.Canceled && result.Data is Order newOrder)
         {
-            var createdOrder = await UnitOfWork.OrderService.CreateAsync(newOrder);
+            var createdOrder = await UnitOfWork.Orders.CreateAsync(newOrder);
             orders.Add(createdOrder);
         }
     }
@@ -60,9 +61,9 @@
         var dialog = DialogService.Show<OrderDialog>("Edit Order", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Cancelled && result.Data is Order updatedOrder)
+        if (!result.Canceled && result.Data is Order updatedOrder)
         {
-            await UnitOfWork.OrderService.UpdateAsync(updatedOrder);
+            await UnitOfWork.Orders.UpdateAsync(updatedOrder);
             var index = orders.IndexOf(order);
             if (index >= 0) orders[index] = updatedOrder;
         }
@@ -72,12 +73,12 @@
     {
         var confirmed = await DialogService.ShowMessageBox(
             "Delete Order",
-            $"Are you sure you want to delete Order ID: {order.OrderId}?",
+            $"Are you sure you want to delete Order ID: {order.Id}?",
             yesText: "Yes", cancelText: "No");
 
         if (confirmed == true)
         {
-            await UnitOfWork.OrderService.DeleteAsync(order.Id);
+            await UnitOfWork.Orders.DeleteAsync(order.Id);
             orders.Remove(order);
         }
     }

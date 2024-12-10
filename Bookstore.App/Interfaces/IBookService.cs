@@ -1,6 +1,6 @@
-﻿using Bookstore.Web.Models;
+﻿using Bookstore.App.Models;
 
-namespace Bookstore.Web.Interfaces
+namespace Bookstore.App.Interfaces
 {
     public interface IBookService : IGenericService<Book>
     {

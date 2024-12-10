@@ -1,10 +1,13 @@
 ﻿@page "/books"
 
+@inject IDialogService DialogService
 @inject IUnitOfWork UnitOfWork
-
 <MudContainer>
     <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Books</MudText>
     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddBook">Add Book</MudButton>
+    <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
+        Open Simple Dialog
+    </MudButton>
     <MudTable Items="@books" Elevation="1">
         <HeaderContent>
             <MudTh>Title</MudTh>
@@ -34,20 +37,22 @@
 
     private async Task LoadBooksAsync()
     {
-        books = (await UnitOfWork.BookService.GetAllAsync()).ToList();
+        books = (await UnitOfWork.Books.GetAllAsync()).ToList();
     }
 
     private async Task AddBook()
     {
+        Console.WriteLine("AddBook clicked");
         var parameters = new DialogParameters { ["Book"] = new Book() };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small };
 
-        var dialog = DialogService.Show<BookDialog>("Add Book", parameters, options);
+        var dialog = await DialogService.ShowAsync<BookDialog>("Add Book", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Cancelled && result.Data is Book newBook)
+        if (!result.Canceled && result.Data is Book newBook)
         {
-            var createdBook = await UnitOfWork.BookService.CreateAsync(newBook);
+            Console.WriteLine("Dialog result received");
+            var createdBook = await UnitOfWork.Books.CreateAsync(newBook);
             books.Add(createdBook);
         }
     }
@@ -57,12 +62,12 @@
         var parameters = new DialogParameters { ["Book"] = book };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small };
 
-        var dialog = DialogService.Show<BookDialog>("Edit Book", parameters, options);
+        var dialog = await DialogService.ShowAsync<BookDialog>("Add Book", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Cancelled && result.Data is Book updatedBook)
+        if (!result.Canceled && result.Data is Book updatedBook)
         {
-            await UnitOfWork.BookService.UpdateAsync(updatedBook);
+            await UnitOfWork.Books.UpdateAsync(updatedBook);
             var index = books.IndexOf(book);
             if (index >= 0) books[index] = updatedBook;
         }
@@ -77,8 +82,15 @@
 
         if (confirmed == true)
         {
-            await UnitOfWork.BookService.DeleteAsync(book.Id);
+            await UnitOfWork.Books.DeleteAsync(book.Id);
             books.Remove(book);
         }
+    }
+
+    private Task OpenDialogAsync()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+
+        return DialogService.ShowAsync<BookDialog>("Simple Dialog", options);
     }
 }

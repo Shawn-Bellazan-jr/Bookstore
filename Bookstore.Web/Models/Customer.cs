@@ -1,4 +1,4 @@
-﻿namespace Bookstore.App.Models
+﻿namespace Bookstore.Web.Models
 {
     public class Customer : BaseModel
     {

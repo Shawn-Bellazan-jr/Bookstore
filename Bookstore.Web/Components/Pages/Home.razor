@@ -2,6 +2,62 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<MudContainer>
+    <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-4">Welcome to the Bookstore App</MudText>
+    <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-4">
+        Manage your books, customers, and orders efficiently.
+    </MudText>
 
-Welcome to your new app.
+    <MudGrid>
+        <MudItem xs="12" sm="4">
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Books</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2">
+                        Add, edit, and manage your book collection.
+                    </MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Link="/books" Variant="Variant.Filled" Color="Color.Primary">Manage Books</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Customers</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2">
+                        Keep track of your customers and their details.
+                    </MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Link="/customers" Variant="Variant.Filled" Color="Color.Primary">Manage Customers</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Orders</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2">
+                        View and process customer orders seamlessly.
+                    </MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Link="/orders" Variant="Variant.Filled" Color="Color.Primary">Manage Orders</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    // Add any necessary code-behind logic here
+}
+
