@@ -1,0 +1,86 @@
+﻿@page "/books"
+
+<MudContainer>
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Books</MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddBook">Add Book</MudButton>
+    <MudTable Items="@books" Elevation="1">
+        <HeaderContent>
+            <MudTh>Title</MudTh>
+            <MudTh>Author</MudTh>
+            <MudTh>Price</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Title</MudTd>
+            <MudTd>@context.Author</MudTd>
+            <MudTd>@context.Price.ToString("C")</MudTd>
+            <MudTd>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="@(() => EditBook(context))">Edit</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="@(() => DeleteBook(context))">Delete</MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
+
+@code {
+    [Inject] private IDialogService DialogService { get; set; }
+
+    private List<Book> books = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        books = await FetchBooksAsync();
+    }
+
+    private async Task<List<Book>> FetchBooksAsync()
+    {
+        // Temporary mock data
+        return new List<Book>
+        {
+            new Book { Title = "Book 1", Author = "Author 1", Price = 9.99M },
+            new Book { Title = "Book 2", Author = "Author 2", Price = 14.99M },
+        };
+    }
+
+    private async Task AddBook()
+    {
+        var parameters = new DialogParameters { ["Book"] = new Book() }; // Pass a new empty Book
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small };
+
+        var dialog = DialogService.Show<BookDialog>("Add Book", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is Book newBook)
+        {
+            books.Add(newBook);
+        }
+    }
+
+    private async Task EditBook(Book book)
+    {
+        var parameters = new DialogParameters { ["Book"] = book }; // Pass the selected book
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small };
+
+        var dialog = DialogService.Show<BookDialog>("Edit Book", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is Book updatedBook)
+        {
+            var index = books.IndexOf(book);
+            if (index >= 0) books[index] = updatedBook;
+        }
+    }
+
+    private async Task DeleteBook(Book book)
+    {
+        var confirmed = await DialogService.ShowMessageBox(
+            "Delete Book",
+            $"Are you sure you want to delete \"{book.Title}\"?",
+            yesText: "Yes", cancelText: "No");
+
+        if (confirmed == true)
+        {
+            books.Remove(book);
+        }
+    }
+}

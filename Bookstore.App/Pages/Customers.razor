@@ -1,0 +1,85 @@
+﻿@page "/customers"
+@inject IDialogService DialogService
+
+<MudContainer>
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Customers</MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddCustomer">Add Customer</MudButton>
+    <MudTable Items="@customers" Elevation="1">
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Phone</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.Email</MudTd>
+            <MudTd>@context.Phone</MudTd>
+            <MudTd>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="@(() => EditCustomer(context))">Edit</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="@(() => DeleteCustomer(context))">Delete</MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
+
+@code {
+    private List<Customer> customers = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        customers = await FetchCustomersAsync();
+    }
+
+    private async Task<List<Customer>> FetchCustomersAsync()
+    {
+        // Mock data
+        return new List<Customer>
+        {
+            new Customer { Id = 1, Name = "John Doe", Email = "john.doe@example.com", Phone = "123-456-7890" },
+            new Customer { Id = 2, Name = "Jane Smith", Email = "jane.smith@example.com", Phone = "987-654-3210" }
+        };
+    }
+
+    private async Task AddCustomer()
+    {
+        var parameters = new DialogParameters { ["Customer"] = new Customer() };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small };
+
+        var dialog = DialogService.Show<CustomerDialog>("Add Customer", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is Customer newCustomer)
+        {
+            customers.Add(newCustomer);
+        }
+    }
+
+    private async Task EditCustomer(Customer customer)
+    {
+        var parameters = new DialogParameters { ["Customer"] = customer };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small };
+
+        var dialog = DialogService.Show<CustomerDialog>("Edit Customer", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is Customer updatedCustomer)
+        {
+            var index = customers.IndexOf(customer);
+            if (index >= 0) customers[index] = updatedCustomer;
+        }
+    }
+
+    private async Task DeleteCustomer(Customer customer)
+    {
+        var confirmed = await DialogService.ShowMessageBox(
+            "Delete Customer",
+            $"Are you sure you want to delete \"{customer.Name}\"?",
+            yesText: "Yes", cancelText: "No");
+
+        if (confirmed == true)
+        {
+            customers.Remove(customer);
+        }
+    }
+}

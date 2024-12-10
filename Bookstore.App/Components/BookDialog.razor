@@ -1,0 +1,60 @@
+﻿@using static MudBlazor.MudDialog
+
+<MudDialog>
+    <TitleContent>
+        @if (Book.Id == 0)
+        {
+            <MudText Typo="Typo.h6">Add Book</MudText>
+        }
+        else
+        {
+            <MudText Typo="Typo.h6">Edit Book</MudText>
+        }
+        @if (_validationError)
+        {
+            <MudText Typo="Typo.caption" Color="Color.Error">
+                All fields are required, and the price must be greater than 0.
+            </MudText>
+        }
+
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Label="Title" @bind-Value="Book.Title" For="@(() => Book.Title)" Required="true" Class="mb-3" />
+        <MudTextField Label="Author" @bind-Value="Book.Author" For="@(() => Book.Author)" Required="true" Class="mb-3" />
+        <MudNumericField Label="Price" @bind-Value="Book.Price" For="@(() => Book.Price)" Required="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Outlined" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+    @code {
+        [CascadingParameter]
+        private IMudDialogInstance MudDialog { get; set; }
+
+        [Parameter]
+        public Book Book { get; set; } = new Book();
+
+    private bool _validationError;
+
+    private void Submit()
+    {
+        if (string.IsNullOrWhiteSpace(Book.Title) || string.IsNullOrWhiteSpace(Book.Author) || Book.Price <= 0)
+        {
+            _validationError = true;
+            return;
+        }
+
+        _validationError = false;
+        MudDialog.Close(DialogResult.Ok(Book));
+    }
+
+
+    private async Task Cancel()
+    {
+        MudDialog.Close(DialogResult.Cancel());
+        MudDialog.Cancel();
+    }
+    }

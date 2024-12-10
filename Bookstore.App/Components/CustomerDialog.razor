@@ -1,0 +1,47 @@
+﻿@using static MudBlazor.MudDialog
+
+<MudDialog>
+    <TitleContent>
+        @if (Customer.Id == 0)
+        {
+            <MudText Typo="Typo.h6">Add Customer</MudText>
+        }
+        else
+        {
+            <MudText Typo="Typo.h6">Edit Customer</MudText>
+        }
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Label="Name" @bind-Value="Customer.Name" For="@(() => Customer.Name)" Required="true" />
+        <MudTextField Label="Email" @bind-Value="Customer.Email" For="@(() => Customer.Email)" Required="true" />
+        <MudTextField Label="Phone" @bind-Value="Customer.Phone" For="@(() => Customer.Phone)" Required="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Outlined" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Customer Customer { get; set; } = new Customer();
+
+    private void Submit()
+    {
+        if (string.IsNullOrWhiteSpace(Customer.Name) || string.IsNullOrWhiteSpace(Customer.Email) || string.IsNullOrWhiteSpace(Customer.Phone))
+        {
+            return; // Add validation feedback if necessary
+        }
+
+        MudDialog.Close(DialogResult.Ok(Customer));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}
+

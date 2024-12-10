@@ -1,0 +1,43 @@
+﻿<MudDialog>
+    <TitleContent>
+        @if (Order.Id == 0)
+        {
+            <MudText Typo="Typo.h6">Add Order</MudText>
+        }
+        else
+        {
+            <MudText Typo="Typo.h6">Edit Order</MudText>
+        }
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Label="Customer Name" @bind-Value="Order.CustomerName" For="@(() => Order.CustomerName)" Required="true" />
+        <MudNumericField Label="Total Amount" @bind-Value="Order.Total" For="@(() => Order.Total)" Required="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Outlined" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Order Order { get; set; } = new Order();
+
+    private void Submit()
+    {
+        if (string.IsNullOrWhiteSpace(Order.CustomerName) || Order.Total <= 0)
+        {
+            return; // Add validation feedback if necessary
+        }
+
+        MudDialog.Close(DialogResult.Ok(Order));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}
+

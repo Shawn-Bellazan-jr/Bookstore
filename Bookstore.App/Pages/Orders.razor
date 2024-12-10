@@ -1,0 +1,86 @@
+﻿@page "/orders"
+
+<MudContainer>
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Orders</MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddOrder">Add Order</MudButton>
+    <MudTable Items="@orders" Elevation="1">
+        <HeaderContent>
+            <MudTh>Order ID</MudTh>
+            <MudTh>Customer</MudTh>
+            <MudTh>Total</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Id</MudTd>
+            <MudTd>@context.CustomerName</MudTd>
+            <MudTd>@context.Total.ToString("C")</MudTd>
+            <MudTd>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="@(() => EditOrder(context))">Edit</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="@(() => DeleteOrder(context))">Delete</MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
+
+@code {
+    [Inject] private IDialogService DialogService { get; set; }
+
+    private List<Order> orders = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        orders = await FetchOrdersAsync();
+    }
+
+    private async Task<List<Order>> FetchOrdersAsync()
+    {
+        // Mock data
+        return new List<Order>
+        {
+            new Order { Id = 1, CustomerName = "John Doe", Total = 49.99M },
+            new Order { Id = 2, CustomerName = "Jane Smith", Total = 89.99M },
+        };
+    }
+
+    private async Task AddOrder()
+    {
+        var parameters = new DialogParameters { ["Order"] = new Order() }; // Pass a new empty Order
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small };
+
+        var dialog = DialogService.Show<OrderDialog>("Add Order", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is Order newOrder)
+        {
+            orders.Add(newOrder);
+        }
+    }
+
+    private async Task EditOrder(Order order)
+    {
+        var parameters = new DialogParameters { ["Order"] = order }; // Pass the selected order
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small };
+
+        var dialog = DialogService.Show<OrderDialog>("Edit Order", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is Order updatedOrder)
+        {
+            var index = orders.IndexOf(order);
+            if (index >= 0) orders[index] = updatedOrder;
+        }
+    }
+
+    private async Task DeleteOrder(Order order)
+    {
+        var confirmed = await DialogService.ShowMessageBox(
+            "Delete Order",
+            $"Are you sure you want to delete Order ID: {order.Id}?",
+            yesText: "Yes", cancelText: "No");
+
+        if (confirmed == true)
+        {
+            orders.Remove(order);
+        }
+    }
+}

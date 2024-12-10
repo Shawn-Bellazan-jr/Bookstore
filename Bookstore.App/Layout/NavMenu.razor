@@ -1,0 +1,34 @@
+﻿<MudAppBar Elevation="1">
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+    <MudSpacer />
+    <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+</MudAppBar>
+
+<MudDrawer @bind-Open="_drawerOpen" Elevation="2">
+    <MudDrawerHeader>
+        <MudText Typo="Typo.h5" Class="mt-1">Bookstore App</MudText>
+    </MudDrawerHeader>
+    <MudNavMenu>
+        <MudNavLink Href="/" Icon="@Icons.Material.Filled.Home" Match="NavLinkMatch.All">
+            Home
+        </MudNavLink>
+        <MudNavLink Href="/books" Icon="@Icons.Material.Filled.MenuBook">
+            Books
+        </MudNavLink>
+        <MudNavLink Href="/customers" Icon="@Icons.Material.Filled.People">
+            Customers
+        </MudNavLink>
+        <MudNavLink Href="/orders" Icon="@Icons.Material.Filled.Receipt">
+            Orders
+        </MudNavLink>
+    </MudNavMenu>
+</MudDrawer>
+
+@code {
+    private bool _drawerOpen = true;
+
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}
